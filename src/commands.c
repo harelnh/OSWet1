@@ -95,27 +95,36 @@ int ExeCmd(void* jobs, char* lineSize, char* cmdString)
 void ExeExternal(char *args[MAX_ARG], char* cmdString)
 {
 	int pID;
+
     	switch(pID = fork()) 
 	{
     		case -1: 
 					// Add your code here (error)
-					
+					//TODO err msg fork failed
+    				// break;
 					/* 
 					your code
 					*/
-        	case 0 :
+        	case 0:
                 	// Child Process
-               		setpgrp();
+               		setpgrp(); //TODO why like this
 					
 			        // Add your code here (execute an external command)
-					
+					if( exec(cmdString) == -1){
+						//in case exec failed
+						perror("failed to execute external command");//TODO maybe add the cmdString to the log error
+					}
+
+					break;
 					/* 
 					your code
 					*/
 			
 			default:
                 	// Add your code here
-					
+					waitpid(pID, NULL, 0);
+
+
 					/* 
 					your code
 					*/
