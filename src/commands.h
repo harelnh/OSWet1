@@ -14,11 +14,11 @@
 typedef enum { FALSE , TRUE } bool;
 typedef struct _Job{
 	int pid;
-	double time;
+	time_t startTime;
 	char cmdStr[MAX_LINE_SIZE];
 } Job;
 int ExeComp(char* lineSize);
-int BgCmd(char* lineSize, void* jobs);
+int BgCmd(char* lineSize, Job jobs[MAX_PROCESSES]);
 int ExeCmd(void* jobs, char* lineSize, char* cmdString);
 void ExeExternal(char *args[MAX_ARG], char* cmdString);
 #endif

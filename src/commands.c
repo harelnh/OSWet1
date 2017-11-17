@@ -33,7 +33,7 @@ int ExeCmd(void* jobs, char* lineSize, char* cmdString)
 /*************************************************/
 	if (!strcmp(cmd, "cd") ) 
 	{
-		cmdCD();
+//		cmdCD();
 	} 
 	
 	/*************************************************/
@@ -223,9 +223,9 @@ int BgCmd(char* lineStr, Job jobs[MAX_PROCESSES])//todo fix signature
 // function name: insertNewJob
 // Description: insert the new job in the first empty place in the list
 // Parameters: Jobs list, process id, string of the entire command line
-// Returns: 0- BG command -1- if not
+// Returns: process id - if insert success otherwise 0
 //**************************************************************************************
-int insertNewJob(Job jobs[MAX_PROCESSES],processID,lineStr){
+int insertNewJob(Job jobs[MAX_PROCESSES],int processID,char *lineStr){
 
 	bool isValidParams = (processID > 0) && (lineStr[0] != '\0'); //TODO maybe there are more conditions
 	if(!isValidParams) return -1;
@@ -233,8 +233,10 @@ int insertNewJob(Job jobs[MAX_PROCESSES],processID,lineStr){
 	for(int i=0;i<MAX_PROCESSES;++i){
 		//insert the new job in the first empty place in the list
 		if(jobs[i].pid == -1){
-
-			return pid;
+			jobs[i].pid = processID;
+			strcpy(lineStr,jobs[i].cmdStr);
+			jobs[i].startTime = time(NULL);
+			return processID;
 		}
 	}
 	//got here in case there was no place for the new job

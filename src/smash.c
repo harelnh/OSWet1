@@ -28,8 +28,8 @@ int main(int argc, char *argv[])
     for (int i = 0; i < MAX_PROCESSES;i++)
     {
     	jobs[i].pid = -1;
-    	jobs[i].time = -1;
-    	jobs[i].cmdStr = '\0';//todo not sure if work
+    	jobs[i].startTime = -1;
+    	strcpy(jobs[i].cmdStr,'\0');//todo not sure if work
     }
 	//signal declarations
 	//NOTE: the signal handlers and the function/s that sets the handler should be found in siganls.c
