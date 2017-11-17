@@ -14,7 +14,12 @@ main file. This file contains the main function of smash
 #define MAXARGS 20
 
 char* L_Fg_Cmd;
-void* jobs = NULL; //This represents the list of jobs. Please change to a preferred type (e.g array of char*)
+typedef struct _Job{
+	int pid;
+	double time;
+	char cmdStr[MAX_LINE_SIZE];
+} Job;
+Job jobs[MAX_PROCESS_AMOUNT]; //This represents the list of jobs. Please change to a preferred type (e.g array of char*)
 char lineSize[MAX_LINE_SIZE]; 
 //**************************************************************************************
 // function name: main
@@ -24,7 +29,14 @@ int main(int argc, char *argv[])
 {
     char cmdString[MAX_LINE_SIZE];
 	
-	//signal declaretcd
+    //init Jobs list
+    for (int i = 0; i < MAX_PROCESS_AMOUNT;i++)
+    {
+    	jobs[i].pid = -1;
+    	jobs[i].time = -1;
+    	jobs[i].cmdStr = '\0';//todo not sure if work
+    }
+	//signal declarations
 	//NOTE: the signal handlers and the function/s that sets the handler should be found in siganls.c
 	 /* add your code here */
 	
@@ -51,10 +63,10 @@ int main(int argc, char *argv[])
 		fgets(lineSize, MAX_LINE_SIZE, stdin);
 		strcpy(cmdString, lineSize);    	
 		cmdString[strlen(lineSize)-1]='\0';
+					// background command
+	 	if(!BgCmd(lineSize, jobs)) continue;
 					// perform a complicated Command
 		if(!ExeComp(lineSize)) continue; 
-					// background command	
-	 	if(!BgCmd(lineSize, jobs)) continue; 
 					// built in commands
 		ExeCmd(jobs, lineSize, cmdString);
 		

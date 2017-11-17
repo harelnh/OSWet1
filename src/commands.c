@@ -33,7 +33,7 @@ int ExeCmd(void* jobs, char* lineSize, char* cmdString)
 /*************************************************/
 	if (!strcmp(cmd, "cd") ) 
 	{
-		
+		cmdCD();
 	} 
 	
 	/*************************************************/
@@ -101,7 +101,8 @@ void ExeExternal(char *args[MAX_ARG], char* cmdString)
     		case -1: 
 					// Add your code here (error)
 					//TODO err msg fork failed
-    				 break;
+    				perror("failed to create process for external command");
+    				break;
 					/* 
 					your code
 					*/
@@ -158,22 +159,62 @@ int ExeComp(char* lineSize)
 // Parameters: command string, pointer to jobs
 // Returns: 0- BG command -1- if not
 //**************************************************************************************
-int BgCmd(char* lineSize, void* jobs)
+int BgCmd(char* lineStr, Job jobs[])//todo fix signature
 {
 
 	char* Command;
 	char* delimiters = " \t\n";
 	char *args[MAX_ARG];
-	if (lineSize[strlen(lineSize)-2] == '&')
+	if (lineStr[strlen(lineStr)-2] == '&' && lineStr[strlen(lineStr)-3] != '|')
 	{
-		lineSize[strlen(lineSize)-2] = '\0';
+		lineStr[strlen(lineStr)-2] = '\0';
 		// Add your code here (execute a in the background)
+		int pID;
+
+		    	switch(pID = fork())
+			{
+		    		case -1:
+							// Add your code here (error)
+							//TODO err msg fork failed
+		    				 perror("failed to create background process for background command");
+		    				 break;
+							/*
+							your code
+							*/
+		        	case 0:
+		                	// Child Process
+		               		setpgrp(); //TODO why like this
+
+					        // Add your code here (execute an external command)
+
+		               		if(execvp(args[0], args) == -1){
+								//in case exec failed
+								perror("failed to execute external command");//TODO maybe add the cmdString to the log error
+								exit(-1);
+							}
+
+							break;
+							/*
+					r		your code
+							*/
 					
-		/* 
-		your code
-		*/
+					default:
+		                	// Add your code here
+
+						insertNewJob(jobs,pID,lineStr);
+							break;
+
+
+							/*
+							your code
+							*/
+			}
 		
 	}
 	return -1;
+}
+
+void insertNewJob(Job jobs[],processID,lineStr){
+	for(int i=0;i<MAX)
 }
 
