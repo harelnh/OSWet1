@@ -10,7 +10,13 @@
 #include <sys/wait.h>
 #define MAX_LINE_SIZE 80
 #define MAX_ARG 20
+#define MAX_PROCESSES 100
 typedef enum { FALSE , TRUE } bool;
+typedef struct _Job{
+	int pid;
+	double time;
+	char cmdStr[MAX_LINE_SIZE];
+} Job;
 int ExeComp(char* lineSize);
 int BgCmd(char* lineSize, void* jobs);
 int ExeCmd(void* jobs, char* lineSize, char* cmdString);

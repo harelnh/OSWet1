@@ -137,7 +137,7 @@ void ExeExternal(char *args[MAX_ARG], char* cmdString)
 // function name: ExeComp
 // Description: executes complicated command
 // Parameters: command string
-// Returns: 0- if complicated -1- if not
+// Returns: 1- if complicated -1- if not
 //**************************************************************************************
 int ExeComp(char* lineSize)
 {
@@ -150,16 +150,19 @@ int ExeComp(char* lineSize)
 		/* 
 		your code
 		*/
+    	//identify that is Exe Complicated
+    	return 1;
 	} 
+	//identify that is NOT Exe Complicated
 	return -1;
 }
 //**************************************************************************************
 // function name: BgCmd
 // Description: if command is in background, insert the command to jobs
 // Parameters: command string, pointer to jobs
-// Returns: 0- BG command -1- if not
+// Returns: 1- BG command -1- if not
 //**************************************************************************************
-int BgCmd(char* lineStr, Job jobs[])//todo fix signature
+int BgCmd(char* lineStr, Job jobs[MAX_PROCESSES])//todo fix signature
 {
 
 	char* Command;
@@ -209,12 +212,46 @@ int BgCmd(char* lineStr, Job jobs[])//todo fix signature
 							your code
 							*/
 			}
+		    	//identify that is BG cmd
+		    	return 1;
 		
 	}
+	//identify that is NOT BG cmd
+	return -1;
+}
+//**************************************************************************************
+// function name: insertNewJob
+// Description: insert the new job in the first empty place in the list
+// Parameters: Jobs list, process id, string of the entire command line
+// Returns: 0- BG command -1- if not
+//**************************************************************************************
+int insertNewJob(Job jobs[MAX_PROCESSES],processID,lineStr){
+
+	bool isValidParams = (processID > 0) && (lineStr[0] != '\0'); //TODO maybe there are more conditions
+	if(!isValidParams) return -1;
+
+	for(int i=0;i<MAX_PROCESSES;++i){
+		//insert the new job in the first empty place in the list
+		if(jobs[i].pid == -1){
+
+			return pid;
+		}
+	}
+	//got here in case there was no place for the new job
 	return -1;
 }
 
-void insertNewJob(Job jobs[],processID,lineStr){
-	for(int i=0;i<MAX)
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
