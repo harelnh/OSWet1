@@ -101,7 +101,7 @@ void ExeExternal(char *args[MAX_ARG], char* cmdString)
     		case -1: 
 					// Add your code here (error)
 					//TODO err msg fork failed
-    				// break;
+    				 break;
 					/* 
 					your code
 					*/
@@ -110,19 +110,21 @@ void ExeExternal(char *args[MAX_ARG], char* cmdString)
                		setpgrp(); //TODO why like this
 					
 			        // Add your code here (execute an external command)
-					if( exec(cmdString) == -1){
+
+               		if(execvp(args[0], args) == -1){
 						//in case exec failed
 						perror("failed to execute external command");//TODO maybe add the cmdString to the log error
 					}
 
 					break;
 					/* 
-					your code
+			r		your code
 					*/
 			
 			default:
                 	// Add your code here
 					waitpid(pID, NULL, 0);
+					break;
 
 
 					/* 
