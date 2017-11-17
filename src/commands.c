@@ -7,84 +7,73 @@
 // Parameters: pointer to jobs, command string
 // Returns: 0 - success,1 - failure
 //**************************************************************************************
-int ExeCmd(void* jobs, char* lineSize, char* cmdString)
-{
-	char* cmd; 
+int ExeCmd(void* jobs, char* lineSize, char* cmdString) {
+	char* cmd;
 	char* args[MAX_ARG];
 	char pwd[MAX_LINE_SIZE];
-	char* delimiters = " \t\n";  
+	char* delimiters = " \t\n";
 	int i = 0, num_arg = 0;
 	bool illegal_cmd = FALSE; // illegal command
-    	cmd = strtok(lineSize, delimiters);
+	cmd = strtok(lineSize, delimiters);
 	if (cmd == NULL)
-		return 0; 
-   	args[0] = cmd;
-	for (i=1; i<MAX_ARG; i++)
-	{
-		args[i] = strtok(NULL, delimiters); 
-		if (args[i] != NULL) 
-			num_arg++; 
- 
+		return 0;
+	args[0] = cmd;
+	for (i = 1; i < MAX_ARG; i++) {
+		args[i] = strtok(NULL, delimiters);
+		if (args[i] != NULL)
+			num_arg++;
+
 	}
-/*************************************************/
+	/*************************************************/
 // Built in Commands PLEASE NOTE NOT ALL REQUIRED
 // ARE IN THIS CHAIN OF IF COMMANDS. PLEASE ADD
 // MORE IF STATEMENTS AS REQUIRED
-/*************************************************/
-	if (!strcmp(cmd, "cd") ) 
-	{
+	/*************************************************/
+	if (!strcmp(cmd, "cd")) {
 //		cmdCD();
-	} 
-	
-	/*************************************************/
-	else if (!strcmp(cmd, "pwd")) 
-	{
-		
 	}
-	
+
 	/*************************************************/
-	else if (!strcmp(cmd, "mkdir"))
-	{
- 		
+	else if (!strcmp(cmd, "pwd")) {
+
+	}
+
+	/*************************************************/
+	else if (!strcmp(cmd, "mkdir")) {
+
 	}
 	/*************************************************/
-	
-	else if (!strcmp(cmd, "jobs")) 
-	{
- 		
+
+	else if (!strcmp(cmd, "jobs")) {
+
 	}
 	/*************************************************/
-	else if (!strcmp(cmd, "showpid")) 
-	{
-		
+	else if (!strcmp(cmd, "showpid")) {
+
 	}
 	/*************************************************/
-	else if (!strcmp(cmd, "fg")) 
-	{
-		
-	} 
-	/*************************************************/
-	else if (!strcmp(cmd, "bg")) 
-	{
-  		
+	else if (!strcmp(cmd, "fg")) {
+
 	}
 	/*************************************************/
-	else if (!strcmp(cmd, "quit"))
-	{
-   		
-	} 
+	else if (!strcmp(cmd, "bg")) {
+
+	}
+	/*************************************************/
+	else if (!strcmp(cmd, "quit")) {
+
+	}
 	/*************************************************/
 	else // external command
 	{
- 		ExeExternal(args, cmdString);
-	 	return 0;
+		ExeExternal(args, cmdString);
+		return 0;
 	}
-	if (illegal_cmd == TRUE)
-	{
+	if (illegal_cmd == TRUE) {
 		printf("smash error: > \"%s\"\n", cmdString);
 		return 1;
 	}
-    return 0;
+	return 0;
 }
 //**************************************************************************************
 // function name: ExeExternal
@@ -92,45 +81,42 @@ int ExeCmd(void* jobs, char* lineSize, char* cmdString)
 // Parameters: external command arguments, external command string
 // Returns: void
 //**************************************************************************************
-void ExeExternal(char *args[MAX_ARG], char* cmdString)
-{
+void ExeExternal(char *args[MAX_ARG], char* cmdString) {
 	int pID;
 
-    	switch(pID = fork()) 
-	{
-    		case -1: 
-					// Add your code here (error)
-					//TODO err msg fork failed
-    				perror("failed to create process for external command");
-    				break;
-					/* 
-					your code
-					*/
-        	case 0:
-                	// Child Process
-               		setpgrp(); //TODO why like this
-					
-			        // Add your code here (execute an external command)
+	switch (pID = fork()) {
+	case -1:
+		// Add your code here (error)
+		//TODO err msg fork failed
+		perror("failed to create process for external command");
+		break;
+		/*
+		 your code
+		 */
+	case 0:
+		// Child Process
+		setpgrp(); //TODO why like this
 
-               		if(execvp(args[0], args) == -1){
-						//in case exec failed
-						perror("failed to execute external command");//TODO maybe add the cmdString to the log error
-					}
+		// Add your code here (execute an external command)
 
-					break;
-					/* 
-			r		your code
-					*/
-			
-			default:
-                	// Add your code here
-					waitpid(pID, NULL, 0);
-					break;
+		if (execvp(args[0], args) == -1) {
+			//in case exec failed
+			perror("failed to execute external command"); //TODO maybe add the cmdString to the log error
+		}
 
+		break;
+		/*
+		 r		your code
+		 */
 
-					/* 
-					your code
-					*/
+	default:
+		// Add your code here
+		waitpid(pID, NULL, 0);
+		break;
+
+		/*
+		 your code
+		 */
 	}
 }
 //**************************************************************************************
@@ -139,20 +125,19 @@ void ExeExternal(char *args[MAX_ARG], char* cmdString)
 // Parameters: command string
 // Returns: 1- if complicated -1- if not
 //**************************************************************************************
-int ExeComp(char* lineSize)
-{
-	char ExtCmd[MAX_LINE_SIZE+2];
+int ExeComp(char* lineSize) {
+	char ExtCmd[MAX_LINE_SIZE + 2];
 	char *args[MAX_ARG];
-    if ((strstr(lineSize, "|")) || (strstr(lineSize, "<")) || (strstr(lineSize, ">")) || (strstr(lineSize, "*")) || (strstr(lineSize, "?")) || (strstr(lineSize, ">>")) || (strstr(lineSize, "|&")))
-    {
+	if ((strstr(lineSize, "|")) || (strstr(lineSize, "<")) || (strstr(lineSize, ">")) || (strstr(lineSize, "*"))
+			|| (strstr(lineSize, "?")) || (strstr(lineSize, ">>")) || (strstr(lineSize, "|&"))) {
 		// Add your code here (execute a complicated command)
-					
+
 		/* 
-		your code
-		*/
-    	//identify that is Exe Complicated
-    	return 1;
-	} 
+		 your code
+		 */
+		//identify that is Exe Complicated
+		return 1;
+	}
 	//identify that is NOT Exe Complicated
 	return -1;
 }
@@ -162,59 +147,43 @@ int ExeComp(char* lineSize)
 // Parameters: command string, pointer to jobs
 // Returns: 1- BG command -1- if not
 //**************************************************************************************
-int BgCmd(char* lineStr, Job jobs[MAX_PROCESSES])//todo fix signature
+int BgCmd(char* lineStr, Job jobs[MAX_PROCESSES]) //todo fix signature
 {
 
 	char* Command;
 	char* delimiters = " \t\n";
 	char *args[MAX_ARG];
-	if (lineStr[strlen(lineStr)-2] == '&' && lineStr[strlen(lineStr)-3] != '|')
-	{
-		lineStr[strlen(lineStr)-2] = '\0';
+	if (lineStr[strlen(lineStr) - 2] == '&' && lineStr[strlen(lineStr) - 3] != '|') {
+		lineStr[strlen(lineStr) - 2] = '\0';
 		// Add your code here (execute a in the background)
 		int pID;
+		int mainPID = getpid();
+		switch (pID = fork()) {
+		case -1:
+			// Add your code here (error)
+			//TODO err msg fork failed
+			perror("failed to create background process for background command");
+			break;
 
-		    	switch(pID = fork())
-			{
-		    		case -1:
-							// Add your code here (error)
-							//TODO err msg fork failed
-		    				 perror("failed to create background process for background command");
-		    				 break;
-							/*
-							your code
-							*/
-		        	case 0:
-		                	// Child Process
-		               		setpgrp(); //TODO why like this
+		case 0:
+			// Child Process
+			setpgrp(); //TODO why like this
+			startWrapperBg(lineStr, jobs, mainPID);
+			break;
 
-					        // Add your code here (execute an external command)
+		default:
+			// Add your code here
 
-		               		if(execvp(args[0], args) == -1){
-								//in case exec failed
-								perror("failed to execute external command");//TODO maybe add the cmdString to the log error
-								exit(-1);
-							}
+			insertNewJob(jobs, pID, lineStr);
+			break;
 
-							break;
-							/*
-					r		your code
-							*/
-					
-					default:
-		                	// Add your code here
+			/*
+			 your code
+			 */
+		}
+		//identify that is BG cmd
+		return 1;
 
-						insertNewJob(jobs,pID,lineStr);
-							break;
-
-
-							/*
-							your code
-							*/
-			}
-		    	//identify that is BG cmd
-		    	return 1;
-		
 	}
 	//identify that is NOT BG cmd
 	return -1;
@@ -225,16 +194,17 @@ int BgCmd(char* lineStr, Job jobs[MAX_PROCESSES])//todo fix signature
 // Parameters: Jobs list, process id, string of the entire command line
 // Returns: process id - if insert success otherwise 0
 //**************************************************************************************
-int insertNewJob(Job jobs[MAX_PROCESSES],int processID,char *lineStr){
+int insertNewJob(Job jobs[MAX_PROCESSES], int processID, char *lineStr) {
 
 	bool isValidParams = (processID > 0) && (lineStr[0] != '\0'); //TODO maybe there are more conditions
-	if(!isValidParams) return -1;
+	if (!isValidParams)
+		return -1;
 
-	for(int i=0;i<MAX_PROCESSES;++i){
+	for (int i = 0; i < MAX_PROCESSES; ++i) {
 		//insert the new job in the first empty place in the list
-		if(jobs[i].pid == -1){
+		if (jobs[i].pid == -1) {
 			jobs[i].pid = processID;
-			strcpy(lineStr,jobs[i].cmdStr);
+			strcpy(lineStr, jobs[i].cmdStr);
 			jobs[i].startTime = time(NULL);
 			return processID;
 		}
@@ -242,18 +212,49 @@ int insertNewJob(Job jobs[MAX_PROCESSES],int processID,char *lineStr){
 	//got here in case there was no place for the new job
 	return -1;
 }
+//todo DOCS
+int startWrapperBg(char* lineStr, Job jobs[MAX_PROCESSES], int mainPID) {
 
+//	char* Command;
+//		char* delimiters = " \t\n";
+//		char *args[MAX_ARG];
 
+	// Add your code here (execute a in the background)
+	int pID;
+	switch (pID = fork()) {
+	case -1:
+		// Add your code here (error)
+		//TODO err msg fork failed
+		perror("failed to create background process for background command");
+		break;
 
+	case 0:
+		// Child Process
+		setpgrp();
+		//TODO add flag isBG to make proper error print in ExeComp and ExeCmd
+		if (!ExeComp(lineStr)) {
+			//prepare cmdString for ExeCmd()
+			char cmdString[MAX_LINE_SIZE];
+			strcpy(cmdString, lineSize);
+			cmdString[strlen(lineSize) - 1] = '\0';
+			// built in commands
+			ExeCmd(jobs, lineStr, cmdString);
+		}
+		//TODO need to kill Child process here - not sure if needed
+		kill(getpid(), SIGINT);
+		break;
 
+	default:
+		// Add your code here
+		waitpid(pID);
+		//todo send signal to main process to remove from job list
+		break;
 
+		/*
+		 your code
+		 */
+	}
+	//todo return something
 
-
-
-
-
-
-
-
-
+}
 
