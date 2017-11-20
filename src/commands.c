@@ -1,6 +1,10 @@
 //		commands.c
 //********************************************
 #include "commands.h"
+
+
+int cmdJobs(Job jobs[MAX_PROCESSES],char *cmd,char* args[MAX_ARG]);
+
 //********************************************
 // function name: ExeCmd
 // Description: interperts and executes built-in commands
@@ -45,7 +49,9 @@ int ExeCmd(void* jobs, char* lineSize, char* cmdString) {
 	/*************************************************/
 
 	else if (!strcmp(cmd, "jobs")) {
-
+		if(cmdJobs(jobs,cmd,args) == -1){
+			//TODO handle error
+		}
 	}
 	/*************************************************/
 	else if (!strcmp(cmd, "showpid")) {
@@ -174,10 +180,10 @@ int BgCmd(char* lineStr, Job jobs[MAX_PROCESSES]) //todo fix signature
 
 		default:
 			//main process insert new Job to the jobs list
-			if(insertNewJob(jobs, pID, lineStr) == -1){
+			if (insertNewJob(jobs, pID, lineStr) == -1) {
 				printf("failed to create background process for background command");
 				//cancel the process we started
-				kill(pID,SIGKILL);
+				kill(pID, SIGKILL);
 			}
 			break;
 		}
@@ -197,14 +203,15 @@ int BgCmd(char* lineStr, Job jobs[MAX_PROCESSES]) //todo fix signature
 int insertNewJob(Job jobs[MAX_PROCESSES], int processID, char *lineStr) {
 
 	bool isValidParams = (processID > 0) && (lineStr[0] != '\0'); //TODO maybe there are more conditions
-	if (!isValidParams)
+	if (!isValidParams) {
 		return -1;
+	}
 
 	for (int i = 0; i < MAX_PROCESSES; ++i) {
 		//insert the new job in the first empty place in the list
 		if (jobs[i].pid == -1) {
 			jobs[i].pid = processID;
-			strcpy(lineStr, jobs[i].cmdStr);
+			strcpy(jobs[i].cmdStr,lineStr);
 			jobs[i].startTime = time(NULL);
 			return processID;
 		}
@@ -213,6 +220,44 @@ int insertNewJob(Job jobs[MAX_PROCESSES], int processID, char *lineStr) {
 	return -1;
 }
 
+//TODO Docs
+int removeJob(int processID,Job jobs[MAX_PROCESSES]) {
+	bool isValidParams = (processID > 0); //TODO maybe there are more conditions
+	if (!isValidParams) {
+		return -1;
+	}
 
+	for (int i = 0; i < MAX_PROCESSES; ++i) {
+		//insert the new job in the first empty place in the list
+		if (jobs[i].pid == processID) {
+			jobs[i].pid = -1;
+			strcpy(jobs[i].cmdStr, '\0');
+			jobs[i].startTime = -1;
+			return processID;
+		}
+	}
+	//got here in case there was no process with this id
+	return -1;
+}
 
+int cmdJobs(Job jobs[MAX_PROCESSES],char *cmd,char* args[MAX_ARG]){
+	int liveCnt = 0;
+	//update job list - remove dead processes
+	for(int i=0;i<MAX_PROCESSES;++i){
+		//skip empty jobs
+		if(jobs[i].pid == -1){
+			continue;
+		}
+		//check if process of the job finished and then remove from list
+		if(waitpid(jobs[i].pid,NULL,WNOHANG) != 0){ //TODO verify if return -1 still mean that process is dead
+			removeJob(jobs[i].pid,jobs);
+		}else{
+			//print the job info
+			liveCnt++;
+			int runtime = time(NULL) - jobs[i].startTime;
+			printf("[%d] %s : %d %d secs\n",liveCnt,cmd,jobs[i].pid,runtime);
+		}
+
+	}
+}
 
