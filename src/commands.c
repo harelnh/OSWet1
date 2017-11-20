@@ -104,10 +104,8 @@ void ExeExternal(char *args[MAX_ARG], char* cmdString) {
 			perror("failed to execute external command"); //TODO maybe add the cmdString to the log error
 		}
 
+		kill(getpid(), SIGKILL);
 		break;
-		/*
-		 r		your code
-		 */
 
 	default:
 		// Add your code here
@@ -149,15 +147,10 @@ int ExeComp(char* lineSize) {
 //**************************************************************************************
 int BgCmd(char* lineStr, Job jobs[MAX_PROCESSES]) //todo fix signature
 {
-
-	char* Command;
-	char* delimiters = " \t\n";
-	char *args[MAX_ARG];
 	if (lineStr[strlen(lineStr) - 2] == '&' && lineStr[strlen(lineStr) - 3] != '|') {
 		lineStr[strlen(lineStr) - 2] = '\0';
 		// Add your code here (execute a in the background)
 		int pID;
-		int mainPID = getpid();
 		switch (pID = fork()) {
 		case -1:
 			// Add your code here (error)
@@ -168,18 +161,25 @@ int BgCmd(char* lineStr, Job jobs[MAX_PROCESSES]) //todo fix signature
 		case 0:
 			// Child Process
 			setpgrp(); //TODO why like this
-			startWrapperBg(lineStr, jobs, mainPID);
+			if (!ExeComp(lineStr)) {
+				//prepare cmdString for ExeCmd()
+				char cmdString[MAX_LINE_SIZE];
+				strcpy(cmdString, lineStr);
+				cmdString[strlen(lineStr) - 1] = '\0';
+				// built in commands
+				ExeCmd(jobs, lineStr, cmdString);
+			}
+			kill(getpid(), SIGKILL);
 			break;
 
 		default:
-			// Add your code here
-
-			insertNewJob(jobs, pID, lineStr);
+			//main process insert new Job to the jobs list
+			if(insertNewJob(jobs, pID, lineStr) == -1){
+				printf("failed to create background process for background command");
+				//cancel the process we started
+				kill(pID,SIGKILL);
+			}
 			break;
-
-			/*
-			 your code
-			 */
 		}
 		//identify that is BG cmd
 		return 1;
@@ -212,49 +212,7 @@ int insertNewJob(Job jobs[MAX_PROCESSES], int processID, char *lineStr) {
 	//got here in case there was no place for the new job
 	return -1;
 }
-//todo DOCS
-int startWrapperBg(char* lineStr, Job jobs[MAX_PROCESSES], int mainPID) {
 
-//	char* Command;
-//		char* delimiters = " \t\n";
-//		char *args[MAX_ARG];
 
-	// Add your code here (execute a in the background)
-	int pID;
-	switch (pID = fork()) {
-	case -1:
-		// Add your code here (error)
-		//TODO err msg fork failed
-		perror("failed to create background process for background command");
-		break;
 
-	case 0:
-		// Child Process
-		setpgrp();
-		//TODO add flag isBG to make proper error print in ExeComp and ExeCmd
-		if (!ExeComp(lineStr)) {
-			//prepare cmdString for ExeCmd()
-			char cmdString[MAX_LINE_SIZE];
-			strcpy(cmdString, lineSize);
-			cmdString[strlen(lineSize) - 1] = '\0';
-			// built in commands
-			ExeCmd(jobs, lineStr, cmdString);
-		}
-		//TODO need to kill Child process here - not sure if needed
-		kill(getpid(), SIGINT);
-		break;
-
-	default:
-		// Add your code here
-		waitpid(pID);
-		//todo send signal to main process to remove from job list
-		break;
-
-		/*
-		 your code
-		 */
-	}
-	//todo return something
-
-}
 
