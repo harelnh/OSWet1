@@ -179,12 +179,9 @@ int BgCmd(char* lineStr, Job jobs[MAX_PROCESSES]) //todo fix signature
 			break;
 
 		default:
-			//main process insert new Job to the jobs list
-			if (insertNewJob(jobs, pID, lineStr) == -1) {
-				printf("failed to create background process for background command");
-				//cancel the process we started
-				kill(pID, SIGKILL);
-			}
+			// Add your code here
+
+			insertNewJob(jobs, pID, lineStr);
 			break;
 		}
 		//identify that is BG cmd
@@ -220,44 +217,46 @@ int insertNewJob(Job jobs[MAX_PROCESSES], int processID, char *lineStr) {
 	return -1;
 }
 
-//TODO Docs
-int removeJob(int processID,Job jobs[MAX_PROCESSES]) {
-	bool isValidParams = (processID > 0); //TODO maybe there are more conditions
-	if (!isValidParams) {
-		return -1;
-	}
+//	char* Command;
+//		char* delimiters = " \t\n";
+//		char *args[MAX_ARG];
 
-	for (int i = 0; i < MAX_PROCESSES; ++i) {
-		//insert the new job in the first empty place in the list
-		if (jobs[i].pid == processID) {
-			jobs[i].pid = -1;
-			strcpy(jobs[i].cmdStr, '\0');
-			jobs[i].startTime = -1;
-			return processID;
-		}
-	}
-	//got here in case there was no process with this id
-	return -1;
-}
+	// Add your code here (execute a in the background)
+	int pID;
+	switch (pID = fork()) {
+	case -1:
+		// Add your code here (error)
+		//TODO err msg fork failed
+		perror("failed to create background process for background command");
+		break;
 
-int cmdJobs(Job jobs[MAX_PROCESSES],char *cmd,char* args[MAX_ARG]){
-	int liveCnt = 0;
-	//update job list - remove dead processes
-	for(int i=0;i<MAX_PROCESSES;++i){
-		//skip empty jobs
-		if(jobs[i].pid == -1){
-			continue;
+	case 0:
+		// Child Process
+		setpgrp();
+		//TODO add flag isBG to make proper error print in ExeComp and ExeCmd
+		if (!ExeComp(lineStr)) {
+			//prepare cmdString for ExeCmd()
+			char cmdString[MAX_LINE_SIZE];
+			strcpy(cmdString, lineSize);
+			cmdString[strlen(lineSize) - 1] = '\0';
+			// built in commands
+			ExeCmd(jobs, lineStr, cmdString);
 		}
-		//check if process of the job finished and then remove from list
-		if(waitpid(jobs[i].pid,NULL,WNOHANG) != 0){ //TODO verify if return -1 still mean that process is dead
-			removeJob(jobs[i].pid,jobs);
-		}else{
-			//print the job info
-			liveCnt++;
-			int runtime = time(NULL) - jobs[i].startTime;
-			printf("[%d] %s : %d %d secs\n",liveCnt,cmd,jobs[i].pid,runtime);
-		}
+		//TODO need to kill Child process here - not sure if needed
+		kill(getpid(), SIGINT);
+		break;
 
+	default:
+		// Add your code here
+		waitpid(pID);
+		//todo send signal to main process to remove from job list
+		break;
+
+		/*
+		 your code
+		 */
 	}
+	//todo return something
+
 }
 
