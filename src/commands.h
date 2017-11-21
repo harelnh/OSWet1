@@ -22,6 +22,6 @@ int BgCmd(char* lineSize, Job jobs[MAX_PROCESSES]);
 int ExeCmd(void* jobs, char* lineSize, char* cmdString);
 void ExeExternal(char *args[MAX_ARG], char* cmdString);
 int insertNewJob(Job jobs[MAX_PROCESSES], int processID, char *lineStr);
-int removeJob(int processID);
+int removeJob(int processID, Job jobs[MAX_PROCESSES]);
 #endif
 
