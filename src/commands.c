@@ -52,6 +52,7 @@ int ExeCmd(char* lineSize, char* cmdString, char* prevdir, char history[HISTORY_
 	// ARE IN THIS CHAIN OF IF COMMANDS. PLEASE ADD
 	// MORE IF STATEMENTS AS REQUIRED
 	/*************************************************/
+	// cd command
 	if (!strcmp(cmd, "cd"))
 	{
 		if (num_arg != 1)
@@ -64,6 +65,7 @@ int ExeCmd(char* lineSize, char* cmdString, char* prevdir, char history[HISTORY_
 	}
 
 		/*************************************************/
+		// pwd command
 	else if (!strcmp(cmd, "pwd"))
 	{
 		if (num_arg)
@@ -75,6 +77,7 @@ int ExeCmd(char* lineSize, char* cmdString, char* prevdir, char history[HISTORY_
 	}
 
 		/*************************************************/
+		// showing commands history
 	else if (!strcmp(cmd, "history"))
 	{
 		if (num_arg)
@@ -84,7 +87,9 @@ int ExeCmd(char* lineSize, char* cmdString, char* prevdir, char history[HISTORY_
 			return cmdHistory(history);
 		}
 	}
+
 		/*************************************************/
+		// showing the current state of job_list
 	else if (!strcmp(cmd, "jobs"))
 	{
 		if (num_arg)
@@ -94,7 +99,9 @@ int ExeCmd(char* lineSize, char* cmdString, char* prevdir, char history[HISTORY_
 			return cmdJobs(job_list);
 		}
 	}
+
 		/*************************************************/
+		// kill specific command at job_list
 	else if (!strcmp(cmd, "kill"))
 	{
 		if (num_arg != 2)
@@ -105,6 +112,7 @@ int ExeCmd(char* lineSize, char* cmdString, char* prevdir, char history[HISTORY_
 		}
 	}
 		/*************************************************/
+		// showing smash pID
 	else if (!strcmp(cmd, "showpid"))
 	{
 		if (num_arg)
@@ -115,7 +123,9 @@ int ExeCmd(char* lineSize, char* cmdString, char* prevdir, char history[HISTORY_
 			return 0;
 		}
 	}
+
 		/*************************************************/
+		// moving suspended process to run at foreground
 	else if (!strcmp(cmd, "fg"))
 	{
 		if (num_arg != 0 && num_arg != 1){
@@ -128,7 +138,9 @@ int ExeCmd(char* lineSize, char* cmdString, char* prevdir, char history[HISTORY_
 		}
 
 	}
+
 		/*************************************************/
+		// moving suspended process to run at background (job_list)
 	else if (!strcmp(cmd, "bg"))
 	{
 		if(num_arg!=0 && num_arg!=1) {
@@ -141,6 +153,7 @@ int ExeCmd(char* lineSize, char* cmdString, char* prevdir, char history[HISTORY_
 		}
 	}
 		/*************************************************/
+		// quit smash program
 	else if (!strcmp(cmd, "quit"))
 	{
 		if(num_arg!=0 && num_arg!=1)
@@ -162,6 +175,7 @@ int ExeCmd(char* lineSize, char* cmdString, char* prevdir, char history[HISTORY_
 		}
 	}
 		/*************************************************/
+		// none of above has chosen - treat as external command
 	else // external command
 	{
 		ExeExternal(args, cmdString, FALSE, job_list);
@@ -174,6 +188,8 @@ int ExeCmd(char* lineSize, char* cmdString, char* prevdir, char history[HISTORY_
 	}
 	return 0;
 }
+
+// aux : get serial num of last suspended job
 
 int getLastSuspendJob(job job_list[MAX_PROCESSES]) {
 	for (int i = MAX_PROCESSES - 1; i >= 0; i--)  // looking for the last suspended job
@@ -654,14 +670,15 @@ int BgCmd(char* lineSize, job job_list[MAX_PROCESSES])
 
 //**************************************************************************************
 // function name: InsertJob
-// Description: insert a new job to the job list
-// Parameters: pointer to jobs, process name, process pid, start running time, is it running or suspend
-// Returns: bool (TRUE or FALSE)
+// Description: insert job to  job_list
+// Parameters: jobs pointer, process name (cnd) , pid, start running time,
+// running or suspended
+// Returns: bool - success or failure
 //**************************************************************************************
 bool InsertJob(char *process_name, int pid, time_t start_time, bool is_running, job *job_list)
 {
 	int i;
-	for (i = 0; i<MAX_PROCESSES; i++)
+	for (i = 0; i<MAX_PROCESSES; i++) // running over job_list
 	{
 		if (strcmp(job_list[i].name, "\0") == 0)
 		{
@@ -677,15 +694,15 @@ bool InsertJob(char *process_name, int pid, time_t start_time, bool is_running, 
 
 //**************************************************************************************
 // function name: DeleteJob
-// Description: delete a process from the job list
-// Parameters: pointer to jobs, and the pid process
-// Returns: bool (TRUE or FALSE)
+// Description: delete a process from job_list
+// Parameters: jobs pointer, process pid
+// Returns: bool - success or failure
 //**************************************************************************************
 bool DeleteJob(int process_pid, job *job_list)
 {
 	int i;
 	int j;
-	for (i = 0; i<MAX_PROCESSES; i++)
+	for (i = 0; i<MAX_PROCESSES; i++) // running over job_list
 	{
 		if (job_list[i].pid == process_pid)
 		{
@@ -706,14 +723,14 @@ bool DeleteJob(int process_pid, job *job_list)
 
 //**************************************************************************************
 // function name: UpdateJobsList
-// Description: pass on the job list and delete the died processes
-// Parameters: pointer to jobs
-// Returns: None
+// Description: run over job list and delete died processes
+// Parameters:  jobs pointer
+// Returns: none
 //**************************************************************************************
 void UpdateJobsList(job job_list[MAX_PROCESSES])
 {
 	int i;
-	for ( i = 0; i < MAX_PROCESSES; i++)
+	for ( i = 0; i < MAX_PROCESSES; i++) // running over job_list
 	{
 		if (job_list[i].pid != -1 && waitpid(job_list[i].pid, NULL, WNOHANG) != 0) {
 			// if the process died
