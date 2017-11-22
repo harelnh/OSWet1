@@ -16,10 +16,10 @@
 
 typedef enum { FALSE, TRUE } bool;
 typedef struct JOB_ {
-	char  name[MAX_PROCESS_NAME_SIZE];
+	bool is_running;
 	int pid;
 	time_t start_time;
-	bool is_running;
+	char  name[MAX_PROCESS_NAME_SIZE];
 } job, *pjob;
 char* L_Fg_Cmd;
 int pID_Fg;

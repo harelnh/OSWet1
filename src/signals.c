@@ -8,13 +8,35 @@ Synopsis: handle the Control-C */
 #include "signals.h"
 
 //**************************************************************************************
-// function name: SIGTSTP_act
-// Description: send SIGTSTP signal to the process in the foreground, and insert the process to job list
-// Parameters: the signal number
-// Returns: None
+// function name: SIGINT_handler
+// Description: send SIGINT signal to a foreground process.
+// Parameters: signal number
+// Returns: Nada :-)
 //**************************************************************************************
-//TODO change docs
-void SIGTSTP_act(int sig_num)
+void SIGINT_handler(int sig_num)
+{
+	if(pID_Fg!=-1)
+	{
+		if(kill(pID_Fg, SIGINT)==0)
+		{
+			printf("smash > signal SIGINT was sent to pid %d\n", pID_Fg);
+		}
+		else
+		{
+			printf("smash error: > cannot send signal\n");
+		}
+		pID_Fg = -1;
+		strcpy(L_Fg_Cmd, "\0");
+	}
+}
+
+//**************************************************************************************
+// function name: SIGTSTP_handler
+// Description: send SIGTSTP signal to a foreground process, and insert it to the job list
+// Parameters: signal number
+// Returns: Nada
+//**************************************************************************************
+void SIGTSTP_handler(int sig_num)
 {
 	if(pID_Fg!=-1)
 	{
@@ -26,33 +48,11 @@ void SIGTSTP_act(int sig_num)
 		{
 			printf("smash error: > cannot send signal\n");
 		}
-		InsertJob(L_Fg_Cmd, pID_Fg, time(NULL), FALSE, job_list);
+		InsertJob(L_Fg_Cmd, pID_Fg, time(NULL), FALSE, jobs);
 		pID_Fg = -1;
 		strcpy(L_Fg_Cmd, "\0");
 	}
 }
 
-//**************************************************************************************
-// function name: SIGINT_act
-// Description: send SIGINT signal to the process in the foreground
-// Parameters: the signal number
-// Returns: None
-//**************************************************************************************
-//TODO change docs
-void SIGINT_act(int sig_num)
-{
-	if(pID_Fg!=-1)
-	{
-		if(kill(pID_Fg, SIGINT)==0)
-		{
-			printf("smash > signal SIGINT was sent to pid %d\n", pID_Fg);
-		}
-                else
-                {
-                	printf("smash error: > cannot send signal\n");
-                }
-		pID_Fg = -1;
-		strcpy(L_Fg_Cmd, "\0");
-	}
-}
+
 

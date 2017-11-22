@@ -89,7 +89,7 @@ int ExeCmd(char* lineSize, char* cmdString, char* prevdir, char history[HISTORY_
 	}
 
 		/*************************************************/
-		// showing the current state of job_list
+		// showing the current state of jobs
 	else if (!strcmp(cmd, "jobs"))
 	{
 		if (num_arg)
@@ -101,7 +101,7 @@ int ExeCmd(char* lineSize, char* cmdString, char* prevdir, char history[HISTORY_
 	}
 
 		/*************************************************/
-		// kill specific command at job_list
+		// kill specific command at jobs
 	else if (!strcmp(cmd, "kill"))
 	{
 		if (num_arg != 2)
@@ -140,7 +140,7 @@ int ExeCmd(char* lineSize, char* cmdString, char* prevdir, char history[HISTORY_
 	}
 
 		/*************************************************/
-		// moving suspended process to run at background (job_list)
+		// moving suspended process to run at background (jobs)
 	else if (!strcmp(cmd, "bg"))
 	{
 		if(num_arg!=0 && num_arg!=1) {
@@ -162,7 +162,7 @@ int ExeCmd(char* lineSize, char* cmdString, char* prevdir, char history[HISTORY_
 		}
 		else if(num_arg==0)
 		{
-			exit(0); //TODO not sure if we allowed to use exit(0)
+			exit(0);
 		}
 		else if(num_arg==1)
 		{
@@ -448,13 +448,6 @@ int cmdBg(char* args[MAX_ARG],job job_list[MAX_PROCESSES],int num_arg,int last_s
 			{
 				printf("smash > signal SIGCONT was sent to pid %d\n", job_list[job_number-1].pid);
 				printf("%s\n", job_list[job_number - 1].name);
-				//char  name[MAX_PROCESS_NAME_SIZE];
-				//strcpy(name,job_list[job_number-1].name);
-				//int process_pid = job_list[job_number-1].process_pid;
-				//time_t process_start_time= job_list[job_number-1].start_running_time;
-				//InsertJob(job_list[job_number-1].name,job_list[job_number-1].start_running_time,job_list[job_number-1].process_pid,TRUE,job_list);
-				//DeleteJob(job_list[job_number-1].process_pid,job_list);
-				//InsertJob(name,process_start_time,process_pid,TRUE,job_list);
 				job_list[job_number-1].is_running=TRUE;
 				return 0;
 			}
@@ -481,13 +474,6 @@ int cmdBg(char* args[MAX_ARG],job job_list[MAX_PROCESSES],int num_arg,int last_s
 		{
 			printf("smash > signal SIGCONT was sent to pid %d\n", job_list[last_stopped_process].pid);
 			printf("%s\n", job_list[last_stopped_process].name);
-			//char  name[MAX_PROCESS_NAME_SIZE];
-			//strcpy(name,job_list[last_stopped_process].name);
-			//int process_pid = job_list[last_stopped_process].process_pid;
-			//time_t process_start_time= job_list[last_stopped_process].start_running_time;
-			//InsertJob(job_list[last_stopped_process].name,job_list[last_stopped_process].start_running_time,job_list[last_stopped_process].process_pid,TRUE,job_list);
-			//DeleteJob(job_list[last_stopped_process].process_pid,job_list);
-
 			job_list[last_stopped_process].is_running =TRUE;
 			return 0;
 		}
@@ -512,7 +498,8 @@ void cmdQuit(job job_list[MAX_PROCESSES]){
 			{
 				time_t sigSentTime = time(NULL);
 				while (difftime(time(NULL), sigSentTime) < 5)
-				{ // 5 sec hassn't passed
+				{
+                    // 5 sec hassn't passed
 					if (waitpid(job_list[i].pid, NULL, WNOHANG) != 0)
 					{ //finished
 						printf("Done.\n");
@@ -656,11 +643,11 @@ int BgCmd(char* lineSize, job job_list[MAX_PROCESSES])
 			char * cmd = strtok(lineSize, delimiters);
 			if (cmd == NULL)
 				return 0;
-			args[0] = cmd;
 			for (i = 1; i<MAX_ARG; i++)
 			{
 				args[i] = strtok(NULL, delimiters);
 			}
+			args[0] = cmd;
 			ExeExternal(args, lineSize, TRUE, job_list);
 		}
 		return 0;
@@ -670,7 +657,7 @@ int BgCmd(char* lineSize, job job_list[MAX_PROCESSES])
 
 //**************************************************************************************
 // function name: InsertJob
-// Description: insert job to  job_list
+// Description: insert job to  jobs
 // Parameters: jobs pointer, process name (cnd) , pid, start running time,
 // running or suspended
 // Returns: bool - success or failure
@@ -678,7 +665,7 @@ int BgCmd(char* lineSize, job job_list[MAX_PROCESSES])
 bool InsertJob(char *process_name, int pid, time_t start_time, bool is_running, job *job_list)
 {
 	int i;
-	for (i = 0; i<MAX_PROCESSES; i++) // running over job_list
+	for (i = 0; i<MAX_PROCESSES; i++) // running over jobs
 	{
 		if (strcmp(job_list[i].name, "\0") == 0)
 		{
@@ -694,7 +681,7 @@ bool InsertJob(char *process_name, int pid, time_t start_time, bool is_running, 
 
 //**************************************************************************************
 // function name: DeleteJob
-// Description: delete a process from job_list
+// Description: delete a process from jobs
 // Parameters: jobs pointer, process pid
 // Returns: bool - success or failure
 //**************************************************************************************
@@ -702,7 +689,7 @@ bool DeleteJob(int process_pid, job *job_list)
 {
 	int i;
 	int j;
-	for (i = 0; i<MAX_PROCESSES; i++) // running over job_list
+	for (i = 0; i<MAX_PROCESSES; i++) // running over jobs
 	{
 		if (job_list[i].pid == process_pid)
 		{
@@ -730,7 +717,7 @@ bool DeleteJob(int process_pid, job *job_list)
 void UpdateJobsList(job job_list[MAX_PROCESSES])
 {
 	int i;
-	for ( i = 0; i < MAX_PROCESSES; i++) // running over job_list
+	for ( i = 0; i < MAX_PROCESSES; i++) // running over jobs
 	{
 		if (job_list[i].pid != -1 && waitpid(job_list[i].pid, NULL, WNOHANG) != 0) {
 			// if the process died

@@ -19,7 +19,7 @@ main file. This file contains the main function of smash
 
 extern char* L_Fg_Cmd;
 extern int pID_Fg;
-extern job job_list[MAX_PROCESSES];
+extern job jobs[MAX_PROCESSES];
 
 //void* jobs = NULL; //This represents the list of jobs. Please change to a preferred type (e.g array of char*)
 char lineSize[MAX_LINE_SIZE];
@@ -35,16 +35,16 @@ int main(int argc, char *argv[])
 	char prevdir[MAX_LINE_SIZE];
 
 
-	signal(SIGTSTP, &SIGTSTP_act);
-	signal(SIGINT, &SIGINT_act);
+	signal(SIGTSTP, &SIGTSTP_handler);
+	signal(SIGINT, &SIGINT_handler);
 
 	strcpy(prevdir, "\0"); //initiallize prevdir
 	for (int i = 0; i<MAX_PROCESSES; i++) //initiallize jobs list
 	{
-		job_list[i].pid = -1;
-		job_list[i].start_time = -1;
-		job_list[i].is_running = FALSE;
-		strcpy(job_list[i].name, "\0");
+		jobs[i].pid = -1;
+		jobs[i].start_time = -1;
+		jobs[i].is_running = FALSE;
+		strcpy(jobs[i].name, "\0");
 	}
 	for (int i = 0; i<HISTORY_SIZE; i++) //initiallize history
 	{
@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
 		
 		cmdString[strlen(lineSize) - 1] = '\0';
 		// perform a complicated Command
-		if (!ExeComp(lineSize, FALSE, job_list))
+		if (!ExeComp(lineSize, FALSE, jobs))
 		{
 			for ( i = HISTORY_SIZE - 1; i>0; i--)
 			{
@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
 			continue;
 		}
 		// background command
-		if (!BgCmd(lineSize, job_list))
+		if (!BgCmd(lineSize, jobs))
 		{
 			for ( i = HISTORY_SIZE - 1; i>0; i--)
 			{
@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
 		}
 		 
 		// built in commands
-		ExeCmd(lineSize, cmdString, prevdir, history, job_list);
+		ExeCmd(lineSize, cmdString, prevdir, history, jobs);
 		//Enter command to history
 		for ( i = HISTORY_SIZE - 1; i>0; i--)
 		{
