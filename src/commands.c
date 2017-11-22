@@ -7,7 +7,7 @@ int cmdCd(char* args[MAX_ARG],char* prevdir,char pwd[MAX_LINE_SIZE],char* curpwd
 
 int cmdPwd(char pwd[MAX_LINE_SIZE]) ;
 
-int cmdHistory(char history[HISTORY_SIZE]);
+int cmdHistory(char history[HISTORY_SIZE][MAX_LINE_SIZE]);
 
 int cmdJobs(job job_list[MAX_PROCESSES]);
 
@@ -217,8 +217,10 @@ int cmdPwd(char pwd[MAX_LINE_SIZE]) {
 int cmdCd(char* args[MAX_ARG],char* prevdir,char pwd[MAX_LINE_SIZE],char* curpwdcheck) {
 	if (strcmp("-", args[1]) == 0) // change to previous dir
 	{
-		if (strcmp("\0", prevdir) == 0)
+		if (strcmp("\0", prevdir) == 0) {
 			printf("there is no previous dir \n");
+			return 0;
+		}
 		else
 		{
 			int check = chdir(prevdir);
@@ -260,7 +262,7 @@ int cmdCd(char* args[MAX_ARG],char* prevdir,char pwd[MAX_LINE_SIZE],char* curpwd
 	}
 }
 
-int cmdHistory(char history[HISTORY_SIZE]){
+int cmdHistory(char history[HISTORY_SIZE][MAX_LINE_SIZE]){
 	for (int i = HISTORY_SIZE - 1; i >= 0; i--)
 	{
 		if (strcmp(history[i], "\0") != 0)
@@ -319,10 +321,12 @@ int cmdKill(char* args[MAX_ARG],job job_list[MAX_PROCESSES]){
 	else
 	{
 		printf("smash > signal %d was sent to pid %d\n", signal_number, job_list[job_number-1].pid);
-		if(signal_number == SIGTSTP)
-			job_list[job_number-1].is_running= FALSE;
-		if(signal_number == SIGCONT)
-			job_list[job_number-1].is_running= TRUE;
+		if(signal_number == SIGTSTP) {
+			job_list[job_number - 1].is_running = FALSE;
+		}
+		if(signal_number == SIGCONT) {
+			job_list[job_number - 1].is_running = TRUE;
+		}
 		return 0;
 	}
 }
@@ -429,6 +433,7 @@ int cmdFg(char* args[MAX_ARG],job job_list[MAX_PROCESSES],int num_arg,int last_s
 			return 0;
 		}
 	}
+	return 1;
 }
 
 int cmdBg(char* args[MAX_ARG],job job_list[MAX_PROCESSES],int num_arg,int last_stopped_process){
@@ -483,6 +488,7 @@ int cmdBg(char* args[MAX_ARG],job job_list[MAX_PROCESSES],int num_arg,int last_s
 			return 1;
 		}
 	}
+	return 1;
 }
 
 void cmdQuit(job job_list[MAX_PROCESSES]){
@@ -538,7 +544,6 @@ void cmdQuit(job job_list[MAX_PROCESSES]){
 void ExeExternal(char *args[MAX_ARG], char* cmdString, bool isbg, job job_list[MAX_PROCESSES])
 {
     int pID;
-    char* errmsg_fork;
 	switch (pID = fork())
 	{
 		case -1:
