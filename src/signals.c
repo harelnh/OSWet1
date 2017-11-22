@@ -24,8 +24,8 @@ void SIGTSTP_act(int sig_num)
                 else
                 {
                 	printf("smash error: > cannot send signal\n");
-                }                              
-		InsertJobToJobList(L_Fg_Cmd, pID_Fg, time(NULL), FALSE, job_list);
+                }
+        InsertJob(L_Fg_Cmd, pID_Fg, time(NULL), FALSE, job_list);
 		pID_Fg = -1;
 		strcpy(L_Fg_Cmd, "\0");
 	}

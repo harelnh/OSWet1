@@ -12,24 +12,23 @@
 #define MAX_ARG 20
 #define HISTORY_SIZE 50
 #define MAX_PROCESS_NAME_SIZE 50
-#define MAX_PROCESSES_NUMBER 100
+#define MAX_PROCESSES 100
 
 typedef enum { FALSE, TRUE } bool;
 typedef struct JOB_ {
-	char  process_name[MAX_PROCESS_NAME_SIZE];
-	int process_pid;
-	time_t start_running_time;
+	char  name[MAX_PROCESS_NAME_SIZE];
+	int pid;
+	time_t start_time;
 	bool is_running;
 } job, *pjob;
 int pID_Fg;
 char* L_Fg_Cmd;
-
-int ExeComp(char* lineSize, bool isbg, job job_list[MAX_PROCESSES_NUMBER]);
-int BgCmd(char* lineSize, job job_list[MAX_PROCESSES_NUMBER]);
-int ExeCmd(char* lineSize, char* cmdString, char* prevdir, char history[HISTORY_SIZE][MAX_LINE_SIZE], job job_list[MAX_PROCESSES_NUMBER]);
-void ExeExternal(char *args[MAX_ARG], char* cmdString, bool isbg, job job_list[MAX_PROCESSES_NUMBER]);
-void UpdateJobsList(job job_list[MAX_PROCESSES_NUMBER]);
-bool InsertJobToJobList(char  process_name[MAX_PROCESS_NAME_SIZE], int process_pid, time_t start_running_time, bool is_running, job job_list[MAX_PROCESSES_NUMBER]);
-bool DeleteJobFromJobList(int process_pid, job job_list[MAX_PROCESSES_NUMBER]);
+int ExeComp(char* lineSize, bool isbg, job job_list[MAX_PROCESSES]);
+int BgCmd(char* lineSize, job job_list[MAX_PROCESSES]);
+int ExeCmd(char* lineSize, char* cmdString, char* prevdir, char history[HISTORY_SIZE][MAX_LINE_SIZE], job job_list[MAX_PROCESSES]);
+void ExeExternal(char *args[MAX_ARG], char* cmdString, bool isbg, job job_list[MAX_PROCESSES]);
+void UpdateJobsList(job job_list[MAX_PROCESSES]);
+bool InsertJob(char *process_name, int pid, time_t start_time, bool is_running, job *job_list);
+bool DeleteJob(int process_pid, job *job_list);
 #endif
 

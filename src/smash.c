@@ -19,7 +19,7 @@ main file. This file contains the main function of smash
 
 extern char* L_Fg_Cmd;
 extern int pID_Fg;
-extern job job_list[MAX_PROCESSES_NUMBER];
+extern job job_list[MAX_PROCESSES];
 
 //void* jobs = NULL; //This represents the list of jobs. Please change to a preferred type (e.g array of char*)
 char lineSize[MAX_LINE_SIZE];
@@ -45,11 +45,11 @@ int main(int argc, char *argv[])
 		strcpy(history[i], "\0");
 	}
 
-	for ( i = 0; i<MAX_PROCESSES_NUMBER; i++) //initiallize jobs list
+	for ( i = 0; i<MAX_PROCESSES; i++) //initiallize jobs list
 	{
-		strcpy(job_list[i].process_name, "\0");
-		job_list[i].process_pid = -1;
-		job_list[i].start_running_time = -1;
+		strcpy(job_list[i].name, "\0");
+		job_list[i].pid = -1;
+		job_list[i].start_time = -1;
 		job_list[i].is_running = FALSE;
 	}
 	pID_Fg = -1;
