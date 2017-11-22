@@ -21,8 +21,8 @@ typedef struct JOB_ {
 	time_t start_time;
 	bool is_running;
 } job, *pjob;
-int pID_Fg;
 char* L_Fg_Cmd;
+int pID_Fg;
 int ExeComp(char* lineSize, bool isbg, job job_list[MAX_PROCESSES]);
 int BgCmd(char* lineSize, job job_list[MAX_PROCESSES]);
 int ExeCmd(char* lineSize, char* cmdString, char* prevdir, char history[HISTORY_SIZE][MAX_LINE_SIZE], job job_list[MAX_PROCESSES]);

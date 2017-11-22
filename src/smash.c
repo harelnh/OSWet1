@@ -30,28 +30,27 @@ char lineSize[MAX_LINE_SIZE];
 int main(int argc, char *argv[])
 {
 	pID_Fg = -1;
+	char history[HISTORY_SIZE][MAX_LINE_SIZE];
 	char cmdString[MAX_LINE_SIZE];
 	char prevdir[MAX_LINE_SIZE];
-	char history[HISTORY_SIZE][MAX_LINE_SIZE];
 
 
-	signal(SIGINT, &SIGINT_act);
 	signal(SIGTSTP, &SIGTSTP_act);
+	signal(SIGINT, &SIGINT_act);
 
 	strcpy(prevdir, "\0"); //initiallize prevdir
- int i;
-	for ( i = 0; i<HISTORY_SIZE; i++) //initiallize history
+	for (int i = 0; i<MAX_PROCESSES; i++) //initiallize jobs list
+	{
+		job_list[i].pid = -1;
+		job_list[i].start_time = -1;
+		job_list[i].is_running = FALSE;
+		strcpy(job_list[i].name, "\0");
+	}
+	for (int i = 0; i<HISTORY_SIZE; i++) //initiallize history
 	{
 		strcpy(history[i], "\0");
 	}
 
-	for ( i = 0; i<MAX_PROCESSES; i++) //initiallize jobs list
-	{
-		strcpy(job_list[i].name, "\0");
-		job_list[i].pid = -1;
-		job_list[i].start_time = -1;
-		job_list[i].is_running = FALSE;
-	}
 	pID_Fg = -1;
 	//signal declaretions
 	//NOTE: the signal handlers and the function/s that sets the handler should be found in siganls.c

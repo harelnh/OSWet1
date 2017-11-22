@@ -191,7 +191,7 @@ int cmdPwd(char pwd[MAX_LINE_SIZE]) {
 	pwdcheck = getcwd(pwd, MAX_LINE_SIZE);
 	if (pwdcheck == NULL)
 	{
-		perror("pwd failed!\n");
+		perror("pwd failed :-(\n");
 		return 1;
 	}
 	printf("%s\n", pwd);
@@ -202,7 +202,7 @@ int cmdCd(char* args[MAX_ARG],char* prevdir,char pwd[MAX_LINE_SIZE],char* curpwd
 	if (strcmp("-", args[1]) == 0) // change to previous dir
 	{
 		if (strcmp("\0", prevdir) == 0)
-			printf("there is no previous directory \n");
+			printf("there is no previous dir \n");
 		else
 		{
 			int check = chdir(prevdir);
@@ -238,7 +238,7 @@ int cmdCd(char* args[MAX_ARG],char* prevdir,char pwd[MAX_LINE_SIZE],char* curpwd
 		}
 		else
 		{
-			perror("failed to cd \n");
+			perror("failed executing cd \n");
 			return 1;
 		}
 	}
@@ -534,21 +534,18 @@ void cmdQuit(job job_list[MAX_PROCESSES]){
 //**************************************************************************************
 void ExeExternal(char *args[MAX_ARG], char* cmdString, bool isbg, job job_list[MAX_PROCESSES])
 {
-	char* exec_child_error;
-	char* forkerror;
-	int pID;
+    int pID;
+    char* errmsg_fork;
 	switch (pID = fork())
 	{
 		case -1:
-			forkerror = (isbg) ? "ExeExternal fork error:failed to create new bg process\n" : "ExeExternal fork error:failed to create new process\n";
-			perror(forkerror);
+			perror((isbg) ? "ExeExternal - failed to create new bg process\n" : "ExeExternal - failed to create new process\n");
 			return;
 		case 0:
 			// Child Process
 			setpgrp();
 			execvp(args[0], args);
-			exec_child_error = (isbg) ? "ExeExternal: execvp failed! (bg)\n" : "ExeExternal: execvp failed!\n";
-			perror(exec_child_error);
+			perror((isbg) ? "ExeExternal - execvp failed (bg) :-(\n" : "ExeExternal: execvp failed :-(\n");
 			exit(-1);
 		default:
 			// Father process
@@ -576,8 +573,6 @@ void ExeExternal(char *args[MAX_ARG], char* cmdString, bool isbg, job job_list[M
 int ExeComp(char* lineSize, bool isbg, job job_list[MAX_PROCESSES])
 {
 	char *args[MAX_ARG];
-	char* forkerror;
-	char* exec_child_error;
 	int i;
 	if (((strstr(lineSize, "|")) || (strstr(lineSize, "<")) || (strstr(lineSize, ">")) || (strstr(lineSize, "*")) || (strstr(lineSize, "?")) || (strstr(lineSize, ">>")) || (strstr(lineSize, "|&")))
 		&& lineSize[strlen(lineSize) - 2] != '&')
@@ -594,15 +589,13 @@ int ExeComp(char* lineSize, bool isbg, job job_list[MAX_PROCESSES])
 		switch (pID = fork())
 		{
 			case -1:
-				forkerror = (isbg) ? "ExeComp fork error: failed to create new bg process\n" : "ExeComp fork error:failed to create new process\n";
-				perror(forkerror);
+				perror((isbg) ? "ExeComp - failed to create new bg process\n" : "ExeComp - failed to create new process\n");
 				return 0;
 			case 0:
 				// Child Process
-				exec_child_error = (isbg) ? "ExeComp: execvp failed! (bg)\n" : "ExeComp: execvp failed!\n";
 				setpgrp();
-				execvp(args[0], args);
-				perror(exec_child_error);
+                execvp(args[0], args);
+                perror((isbg) ? "ExeComp - execvp failed (bg) :-(\n" : "ExeComp - execvp failed :-(\n");
 				exit(-1);
 			default:
 				//Father process

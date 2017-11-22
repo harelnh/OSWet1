@@ -13,19 +13,20 @@ Synopsis: handle the Control-C */
 // Parameters: the signal number
 // Returns: None
 //**************************************************************************************
+//TODO change docs
 void SIGTSTP_act(int sig_num)
 {
 	if(pID_Fg!=-1)
 	{
 		if(kill(pID_Fg, SIGTSTP)==0)
 		{
-			printf("smash > signal SIGTSTP was sent to pid %d\n", pID_Fg);	
-		}                                                                                                                                   
-                else
-                {
-                	printf("smash error: > cannot send signal\n");
-                }
-        InsertJob(L_Fg_Cmd, pID_Fg, time(NULL), FALSE, job_list);
+			printf("smash > signal SIGTSTP was sent to pid %d\n", pID_Fg);
+		}
+		else
+		{
+			printf("smash error: > cannot send signal\n");
+		}
+		InsertJob(L_Fg_Cmd, pID_Fg, time(NULL), FALSE, job_list);
 		pID_Fg = -1;
 		strcpy(L_Fg_Cmd, "\0");
 	}
@@ -37,14 +38,15 @@ void SIGTSTP_act(int sig_num)
 // Parameters: the signal number
 // Returns: None
 //**************************************************************************************
+//TODO change docs
 void SIGINT_act(int sig_num)
 {
 	if(pID_Fg!=-1)
 	{
 		if(kill(pID_Fg, SIGINT)==0)
 		{
-			printf("smash > signal SIGINT was sent to pid %d\n", pID_Fg);	
-		}                                                                                                                                   
+			printf("smash > signal SIGINT was sent to pid %d\n", pID_Fg);
+		}
                 else
                 {
                 	printf("smash error: > cannot send signal\n");
