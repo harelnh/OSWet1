@@ -49,7 +49,7 @@ int ExeCmd(void* jobs, char* lineSize, char* cmdString) {
 	/*************************************************/
 
 	else if (!strcmp(cmd, "jobs")) {
-		if(cmdJobs(jobs,cmd,args) == -1){
+		if(cmdJobs(jobs,cmd,args) == 0){
 			//TODO handle error
 		}
 	}
@@ -134,16 +134,15 @@ int ExeComp(char* lineSize) {
 	char *args[MAX_ARG];
 	if ((strstr(lineSize, "|")) || (strstr(lineSize, "<")) || (strstr(lineSize, ">")) || (strstr(lineSize, "*"))
 			|| (strstr(lineSize, "?")) || (strstr(lineSize, ">>")) || (strstr(lineSize, "|&"))) {
-		// Add your code here (execute a complicated command)
+		//TODO Add your code here (execute a complicated command)
 
-		/* 
-		 your code
-		 */
+
+
 		//identify that is Exe Complicated
 		return 1;
 	}
 	//identify that is NOT Exe Complicated
-	return -1;
+	return 0;
 }
 //**************************************************************************************
 // function name: BgCmd
@@ -180,7 +179,7 @@ int BgCmd(char* lineStr, Job jobs[MAX_PROCESSES]) //todo fix signature
 
 		default:
 			//main process insert new Job to the jobs list
-			if (insertNewJob(jobs, pID, lineStr) == -1) {
+			if (insertNewJob(jobs, pID, lineStr) == 0) {
 				printf("failed to create background process for background command.\n");
 				//cancel the process we started
 				kill(pID, SIGKILL);
@@ -192,7 +191,7 @@ int BgCmd(char* lineStr, Job jobs[MAX_PROCESSES]) //todo fix signature
 
 	}
 	//identify that is NOT BG cmd
-	return -1;
+	return 0;
 }
 //**************************************************************************************
 // function name: insertNewJob
@@ -204,7 +203,7 @@ int insertNewJob(Job jobs[MAX_PROCESSES], int processID, char *lineStr) {
 
 	bool isValidParams = (processID > 0) && (lineStr[0] != '\0'); //TODO maybe there are more conditions
 	if (!isValidParams) {
-		return -1;
+		return 0;
 	}
 
 	for (int i = 0; i < MAX_PROCESSES; ++i) {
@@ -217,14 +216,14 @@ int insertNewJob(Job jobs[MAX_PROCESSES], int processID, char *lineStr) {
 		}
 	}
 	//got here in case there was no place for the new job
-	return -1;
+	return 0;
 }
 
 //TODO Docs
 int removeJob(int processID,Job jobs[MAX_PROCESSES]) {
 	bool isValidParams = (processID > 0); //TODO maybe there are more conditions
 	if (!isValidParams) {
-		return -1;
+		return 0;
 	}
 
 	for (int i = 0; i < MAX_PROCESSES; ++i) {
@@ -237,7 +236,7 @@ int removeJob(int processID,Job jobs[MAX_PROCESSES]) {
 		}
 	}
 	//got here in case there was no process with this id
-	return -1;
+	return 0;
 }
 
 int cmdJobs(Job jobs[MAX_PROCESSES],char *cmd,char* args[MAX_ARG]){
@@ -250,9 +249,9 @@ int cmdJobs(Job jobs[MAX_PROCESSES],char *cmd,char* args[MAX_ARG]){
 		}
 		//check if process of the job finished and then remove from list
 		if(waitpid(jobs[i].pid,NULL,WNOHANG) != 0){ //TODO verify if return -1 still mean that process is dead
-			if(removeJob(jobs[i].pid,jobs) == -1){
+			if(removeJob(jobs[i].pid,jobs) == 0){
 				//TODO print err msg
-				return -1;
+				return 0;
 			}
 		}else{
 			//print the job info
