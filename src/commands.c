@@ -181,7 +181,7 @@ int BgCmd(char* lineStr, Job jobs[MAX_PROCESSES]) //todo fix signature
 		default:
 			//main process insert new Job to the jobs list
 			if (insertNewJob(jobs, pID, lineStr) == -1) {
-				printf("failed to create background process for background command");
+				printf("failed to create background process for background command.\n");
 				//cancel the process we started
 				kill(pID, SIGKILL);
 			}
@@ -231,7 +231,7 @@ int removeJob(int processID,Job jobs[MAX_PROCESSES]) {
 		//insert the new job in the first empty place in the list
 		if (jobs[i].pid == processID) {
 			jobs[i].pid = -1;
-			strcpy(jobs[i].cmdStr, '\0');
+			jobs[i].cmdStr[0] = '\0';
 			jobs[i].startTime = -1;
 			return processID;
 		}
@@ -250,7 +250,10 @@ int cmdJobs(Job jobs[MAX_PROCESSES],char *cmd,char* args[MAX_ARG]){
 		}
 		//check if process of the job finished and then remove from list
 		if(waitpid(jobs[i].pid,NULL,WNOHANG) != 0){ //TODO verify if return -1 still mean that process is dead
-			removeJob(jobs[i].pid,jobs);
+			if(removeJob(jobs[i].pid,jobs) == -1){
+				//TODO print err msg
+				return -1;
+			}
 		}else{
 			//print the job info
 			liveCnt++;
@@ -259,5 +262,7 @@ int cmdJobs(Job jobs[MAX_PROCESSES],char *cmd,char* args[MAX_ARG]){
 		}
 
 	}
+	//got here if success to show job list
+	return 1;
 }
 
