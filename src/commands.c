@@ -254,12 +254,12 @@ int cmdHistory(char history[HISTORY_SIZE]){
 }
 
 int cmdJobs(job job_list[MAX_PROCESSES]) {
-	int time_in_jobs;
 	UpdateJobsList(job_list);
+	int time_in_jobs;
 	for (int i = 0; i<MAX_PROCESSES; i++)
 	{
-		char* status = (job_list[i].is_running) ? "" : "(Stopped)";
 		time_t current_time = time(NULL);
+		char* status = (job_list[i].is_running) ? "" : "(Stopped)";
 		if (strcmp(job_list[i].name, "\0") != 0)
 		{
 			time_in_jobs= current_time - job_list[i].start_time;
@@ -339,9 +339,9 @@ int cmdFg(char* args[MAX_ARG],job job_list[MAX_PROCESSES],int num_arg,int last_s
 			}
 			if (waitpid(job_list[job_number - 1].pid, NULL, WUNTRACED) == -1)
 			{
-				perror("wait pid failed!\n");
-				pID_Fg = -1;
 				strcpy(L_Fg_Cmd, "\0");
+				pID_Fg = -1;
+				perror("wait pid failed!\n");
 			}
 			DeleteJob(job_list[job_number - 1].pid, job_list);
 			pID_Fg = -1;
@@ -534,9 +534,9 @@ void cmdQuit(job job_list[MAX_PROCESSES]){
 //**************************************************************************************
 void ExeExternal(char *args[MAX_ARG], char* cmdString, bool isbg, job job_list[MAX_PROCESSES])
 {
-	int pID;
-	char* forkerror;
 	char* exec_child_error;
+	char* forkerror;
+	int pID;
 	switch (pID = fork())
 	{
 		case -1:
@@ -672,10 +672,10 @@ bool InsertJob(char *process_name, int pid, time_t start_time, bool is_running, 
 	{
 		if (strcmp(job_list[i].name, "\0") == 0)
 		{
-			strcpy(job_list[i].name, process_name);
+			job_list[i].is_running = is_running;
 			job_list[i].pid = pid;
 			job_list[i].start_time = start_time;
-			job_list[i].is_running = is_running;
+			strcpy(job_list[i].name, process_name);
 			return TRUE;
 		}
 	}
@@ -701,10 +701,10 @@ bool DeleteJob(int process_pid, job *job_list)
 				job_list[j] = job_list[j + 1];
 			}
 
-			strcpy(job_list[MAX_PROCESSES - 1].name, "\0");
-			job_list[MAX_PROCESSES - 1].pid = -1;
-			job_list[MAX_PROCESSES - 1].start_time = -1;
 			job_list[MAX_PROCESSES - 1].is_running = FALSE;
+			job_list[MAX_PROCESSES - 1].start_time = -1;
+			job_list[MAX_PROCESSES - 1].pid = -1;
+			strcpy(job_list[MAX_PROCESSES - 1].name, "\0");
 			return TRUE;
 		}
 	}
@@ -722,7 +722,9 @@ void UpdateJobsList(job job_list[MAX_PROCESSES])
 	int i;
 	for ( i = 0; i < MAX_PROCESSES; i++)
 	{
-		if (job_list[i].pid != -1 && waitpid(job_list[i].pid, NULL, WNOHANG) != 0) // if the process died
+		if (job_list[i].pid != -1 && waitpid(job_list[i].pid, NULL, WNOHANG) != 0) {
+			// if the process died
 			DeleteJob(job_list[i].pid, job_list);
+		}
 	}
 }
